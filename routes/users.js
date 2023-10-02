@@ -5,8 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { type } = require('express/lib/response');
 const htmlspecialchars = require('htmlspecialchars');
-const Entities = require('html-entities').AllHtmlEntities;
-const entities = new Entities();
+// const Entities = require('html-entities').AllHtmlEntities;
+// const entities = new Entities();
 const router = express.Router();
 
 
@@ -78,57 +78,59 @@ router.post('/user/registration', (req, res) => {
     })
 })
 
-// //user login with jsonwebtoken - user
-router.post("/user/login", (req, res) => {
-  Users.findOne({
-    idNumber: req.body.idNumber,
-  })
-    .then(user => {
-      if (user) {
-        if (bcrypt.compareSync(req.body.password, user.password)) {
-          const payload = {
-            _id: user._id,
-            idNumber: user.idNumber,
-            name: user.name,
-            email: user.email,
-            mobile: user.mobile,
-            groupId: user.groupId,
-            researchfield: user.researchfield,
-            panel: user.panel,
-            type: user.type,
-            dateRegistered: user.dateRegistered
-          }
-          const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
-            expiresIn: 1440
-          })
-          res.send(userToken)
-        }
 
-        else {
-          // res.json({ error: "Please check your password and try again" })
-          return res.status(401).json({
-            errorMessage: 'User unauthorized!',
-            status: false
-          });
-        }
-      }
-      else {
-        // res.json({ error: "ID number is not registered in the system" })
-        return res.status(401).json({
-          errorMessage: "Your ID number cannot be recognized",
-          status: false
-        });
-      }
-    })
-    .catch(err => {
-      // res.send("error" + err);
-      res.status(400).json({
-        errorMessage: 'Something went wrong!',
-        status: false
-      });
-      console.log("error: " + err);
-    })
-});
+
+
+//user login with jsonwebtoken - user
+// router.post("/user/login", (req, res) => {
+//   Users.findOne({
+//     idNumber: req.body.idNumber,
+//   })
+//     .then(user => {
+//       if (user) {
+//         if (bcrypt.compareSync(req.body.password, user.password)) {
+//           const payload = {
+//             _id: user._id,
+//             idNumber: user.idNumber,
+//             name: user.name,
+//             email: user.email,
+//             mobile: user.mobile,
+//             groupId: user.groupId,
+//             researchfield: user.researchfield,
+//             panel: user.panel,
+//             type: user.type,
+//             dateRegistered: user.dateRegistered
+//           }
+//           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
+//             expiresIn: 1440
+//           })
+//           res.send(userToken)
+//         }
+//         else {
+//           // res.json({ error: "Please check your password and try again" })
+//           return res.status(401).json({
+//             errorMessage: 'User unauthorized!',
+//             status: false
+//           });
+//         }
+//       }
+//       else {
+//         // res.json({ error: "ID number is not registered in the system" })
+//         return res.status(401).json({
+//           errorMessage: "Your ID number cannot be recognized",
+//           status: false
+//         });
+//       }
+//     })
+//     .catch(err => {
+//       // res.send("error" + err);
+//       res.status(400).json({
+//         errorMessage: 'Something went wrong!',
+//         status: false
+//       });
+//       console.log("error: " + err);
+//     })
+// });
 
 
 
