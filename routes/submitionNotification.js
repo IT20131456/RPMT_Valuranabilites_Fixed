@@ -50,30 +50,68 @@ notify.post('/submitiont/email',(req,res)=>{
 
 
 
-      var mailOptions = {
-              to: [],
-              bcc: mailList,
-              from: process.env.MAIL_FROM,
-              subject: req.body.subject,
+      // var mailOptions = {
+      //         to: [],
+      //         bcc: mailList,
+      //         from: process.env.MAIL_FROM,
+      //         subject: req.body.subject,
               
-        html: `
-        <div style="padding:10px;border-style: ridge">
-        <h1>SLIIT</h1>
-        <h3>Research Team</h3>
+      //   html: `
+      //   <div style="padding:10px;border-style: ridge">
+      //   <h1>SLIIT</h1>
+      //   <h3>Research Team</h3>
         
-           <p> <strong> ${req.body.subject} </strong></p>
+      //      <p> <strong> ${req.body.subject} </strong></p>
             
-            <p>${req.body.groupId} Students, your ${req.body.type} session will
-             be held on ${req.body.date} from ${req.body.from} to ${req.body.to} with the ${req.body.panel}.
-              Your participation is mandatory. You can connect via the link below.</p>
+      //       <p>${req.body.groupId} Students, your ${req.body.type} session will
+      //        be held on ${req.body.date} from ${req.body.from} to ${req.body.to} with the ${req.body.panel}.
+      //         Your participation is mandatory. You can connect via the link below.</p>
 
-              <a href=${req.body.link}>Click Here</a> 
+      //         <a href=${req.body.link}>Click Here</a> 
    
-        `
+      //   `
+
+      //     };
+
+
+      const escapeHtml = (unsafe) => {
+        return unsafe
+          .replace(/</g, '&lt;')
+          .replace(/>/g, '&gt;')
+          .replace(/&/g, '&amp;')
+          .replace(/"/g, '&quot;')
+          .replace(/'/g, '&#039;');
+      };
+      
+      var mailOptions = {
+        to: [],
+        bcc: mailList,
+        from: process.env.MAIL_FROM,
+        subject: escapeHtml(req.body.subject), // Sanitize and escape subject
+        html: `
+          <div style="padding:10px;border-style: ridge">
+            <h1>SLIIT</h1>
+            <h3>Research Team</h3>
+            
+            <p> <strong> ${escapeHtml(req.body.subject)} </strong></p> <!-- Sanitize and escape subject -->
+            
+            <p>${escapeHtml(req.body.groupId)} Students, your ${escapeHtml(req.body.type)} session will
+               be held on ${escapeHtml(req.body.date)} from ${escapeHtml(req.body.from)} to ${escapeHtml(req.body.to)} with the ${escapeHtml(req.body.panel)}.
+               Your participation is mandatory. You can connect via the link below.</p>
+            
+            <a href="${escapeHtml(req.body.link)}">Click Here</a> <!-- Sanitize and escape link -->
+          `
+      };
+
+      
+
+      
 
 
 
-          };
+
+
+
           smtpTransport.sendMail(mailOptions, function(err) {
               if(err){
                   console.log(err);
