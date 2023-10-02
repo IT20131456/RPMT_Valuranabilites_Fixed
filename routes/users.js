@@ -79,73 +79,13 @@ router.post('/user/registration', (req, res) => {
 })
 
 // //user login with jsonwebtoken - user
-// router.post("/user/login", (req, res) => {
-//   Users.findOne({
-//     idNumber: req.body.idNumber,
-//   })
-//     .then(user => {
-//       if (user) {
-//         if (bcrypt.compareSync(req.body.password, user.password)) {
-//           const payload = {
-//             _id: user._id,
-//             idNumber: user.idNumber,
-//             name: user.name,
-//             email: user.email,
-//             mobile: user.mobile,
-//             groupId: user.groupId,
-//             researchfield: user.researchfield,
-//             panel: user.panel,
-//             type: user.type,
-//             dateRegistered: user.dateRegistered
-//           }
-//           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
-//             expiresIn: 1440
-//           })
-//           res.send(userToken)
-//         }
-
-//         else {
-//           // res.json({ error: "Please check your password and try again" })
-//           return res.status(401).json({
-//             errorMessage: 'User unauthorized!',
-//             status: false
-//           });
-//         }
-//       }
-//       else {
-//         // res.json({ error: "ID number is not registered in the system" })
-//         return res.status(401).json({
-//           errorMessage: "Your ID number cannot be recognized",
-//           status: false
-//         });
-//       }
-//     })
-//     .catch(err => {
-//       // res.send("error" + err);
-//       res.status(400).json({
-//         errorMessage: 'Something went wrong!',
-//         status: false
-//       });
-//       console.log("error: " + err);
-//     })
-// });
-
-
 router.post("/user/login", (req, res) => {
-  const { idNumber, password } = req.body;
-
-  // Input validation
-  if (!idNumber || !password) {
-    return res.status(400).json({
-      errorMessage: "ID number and password are required",
-      status: false,
-    });
-  }
-
-  Users.findOne({ idNumber })
-    .then((user) => {
+  Users.findOne({
+    idNumber: req.body.idNumber,
+  })
+    .then(user => {
       if (user) {
-        if (bcrypt.compareSync(password, user.password)) {
+        if (bcrypt.compareSync(req.body.password, user.password)) {
           const payload = {
             _id: user._id,
             idNumber: user.idNumber,
@@ -156,34 +96,42 @@ router.post("/user/login", (req, res) => {
             researchfield: user.researchfield,
             panel: user.panel,
             type: user.type,
-            dateRegistered: user.dateRegistered,
-          };
+            dateRegistered: user.dateRegistered
+          }
           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
-            expiresIn: 1440,
-          });
-          const safeUserToken = entities.encode(userToken); // Encode userToken to prevent XSS
-          return res.send(safeUserToken);
-        } else {
+            expiresIn: 1440
+          })
+          res.send(userToken)
+        }
+
+        else {
+          // res.json({ error: "Please check your password and try again" })
           return res.status(401).json({
-            errorMessage: "Incorrect password",
-            status: false,
+            errorMessage: 'User unauthorized!',
+            status: false
           });
         }
-      } else {
+      }
+      else {
+        // res.json({ error: "ID number is not registered in the system" })
         return res.status(401).json({
-          errorMessage: "ID number is not registered in the system",
-          status: false,
+          errorMessage: "Your ID number cannot be recognized",
+          status: false
         });
       }
     })
-    .catch((err) => {
-      console.error("Error: " + err);
-      return res.status(500).json({
-        errorMessage: "Something went wrong!",
-        status: false,
+    .catch(err => {
+      // res.send("error" + err);
+      res.status(400).json({
+        errorMessage: 'Something went wrong!',
+        status: false
       });
-    });
+      console.log("error: " + err);
+    })
 });
+
+
+
 
 
 
