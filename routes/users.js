@@ -5,7 +5,8 @@ const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { type } = require('express/lib/response');
 
-
+const Entities = require('html-entities').AllHtmlEntities;
+const entities = new Entities();
 const router = express.Router();
 
 process.env.SECRET_KEY = "secret2022";
@@ -80,26 +81,54 @@ router.post("/user/login", (req, res) => {
   Users.findOne({
     idNumber: req.body.idNumber,
   })
-    .then(user => {
-      if (user) {
-        if (bcrypt.compareSync(req.body.password, user.password)) {
+    // .then(user => {
+    //   if (user) {
+    //     if (bcrypt.compareSync(req.body.password, user.password)) {
+    //       const payload = {
+    //         _id: user._id,
+    //         idNumber: user.idNumber,
+    //         name: user.name,
+    //         email: user.email,
+    //         mobile: user.mobile,
+    //         groupId: user.groupId,
+    //         researchfield: user.researchfield,
+    //         panel: user.panel,
+    //         type: user.type,
+    //         dateRegistered: user.dateRegistered
+    //       }
+    //       const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
+    //         expiresIn: 1440
+    //       })
+    //       res.send(userToken)
+    //     }
+
+    
+.then(user => {
+  if (user) {
+      if (bcrypt.compareSync(req.body.password, user.password)) {
           const payload = {
-            _id: user._id,
-            idNumber: user.idNumber,
-            name: user.name,
-            email: user.email,
-            mobile: user.mobile,
-            groupId: user.groupId,
-            researchfield: user.researchfield,
-            panel: user.panel,
-            type: user.type,
-            dateRegistered: user.dateRegistered
-          }
+              _id: user._id,
+              idNumber: user.idNumber,
+              name: entities.encode(user.name), // Sanitize user.name
+              email: entities.encode(user.email), // Sanitize user.email
+              mobile: entities.encode(user.mobile), // Sanitize user.mobile
+              groupId: user.groupId,
+              researchfield: entities.encode(user.researchfield), // Sanitize user.researchfield
+              panel: entities.encode(user.panel), // Sanitize user.panel
+              type: entities.encode(user.type), // Sanitize user.type
+              dateRegistered: user.dateRegistered
+          };
           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
-            expiresIn: 1440
-          })
-          res.send(userToken)
-        }
+              expiresIn: 1440
+          });
+          res.send(userToken);
+      }
+  
+
+
+
+
+
         else {
           // res.json({ error: "Please check your password and try again" })
           return res.status(401).json({

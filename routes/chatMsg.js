@@ -41,18 +41,43 @@ router.get("/chatMsg/get/:id", (req, res) => {
 
 // ----- User Model ----- //
 
+// // Get group members by group id
+// router.get("/groupMembers/get/:groupid", (req, res) => {
+//   let groupID = req.params.groupid;
+
+//   Users.find({groupId: groupID}).exec((err, groupMembers) => {
+//       if (err) {
+//           return res.status(400).json({
+//               error: err
+//           })
+//       }
+//       return res.send(groupMembers)
+//   })
+// });
+
+
 // Get group members by group id
 router.get("/groupMembers/get/:groupid", (req, res) => {
   let groupID = req.params.groupid;
 
-  Users.find({groupId: groupID}).exec((err, groupMembers) => {
-      if (err) {
-          return res.status(400).json({
-              error: err
-          })
-      }
-      return res.send(groupMembers)
-  })
+  Users.find({ groupId: groupID }).exec((err, groupMembers) => {
+    if (err) {
+      return res.status(400).json({
+        error: err,
+      });
+    }
+
+    // Sanitize the user data before sending it in the response
+    const sanitizedGroupMembers = groupMembers.map((member) => ({
+      _id: member._id,
+      name: sanitizeHTML(member.name), // Sanitize member.name
+      email: sanitizeHTML(member.email), // Sanitize member.email
+      // Add other fields and sanitize them as needed
+    }));
+
+    return res.json(sanitizedGroupMembers);
+  });
 });
+
 
 module.exports = router;
