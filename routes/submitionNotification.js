@@ -2,7 +2,7 @@
 const express = require("express");
 const nodemailer = require('nodemailer');
 const User = require("../models/users");
-
+const DOMPurify = require('dompurify');
 const notify = express.Router();
 
 
@@ -105,7 +105,7 @@ notify.post('/submitiont/email',(req,res)=>{
 
       
 
-      
+
 
 
 
@@ -188,26 +188,53 @@ notify.post('/submitiontype/email',(req,res)=>{
 
 
 
-    var mailOptions = {
-            to: [],
-            bcc: mailList,
-            from: process.env.MAIL_FROM,
-            subject: req.body.subject,
+    // var mailOptions = {
+    //         to: [],
+    //         bcc: mailList,
+    //         from: process.env.MAIL_FROM,
+    //         subject: req.body.subject,
             
-      html: `
-      <div style="padding:10px;border-style: ridge">
-      <h1>SLIIT</h1>
-      <h3>Research Team</h3>
+    //   html: `
+    //   <div style="padding:10px;border-style: ridge">
+    //   <h1>SLIIT</h1>
+    //   <h3>Research Team</h3>
       
-         <p> <strong> ${req.body.subject} </strong></p>
+    //      <p> <strong> ${req.body.subject} </strong></p>
           
-          <p>${req.body.text}</p>
+    //       <p>${req.body.text}</p>
  
-      `
+    //   `
 
 
 
-        };
+    //     };
+
+
+    
+var mailOptions = {
+  to: [],
+  bcc: mailList,
+  from: process.env.MAIL_FROM,
+  subject: req.body.subject,
+  html: `
+      <div style="padding:10px;border-style: ridge">
+          <h1>SLIIT</h1>
+          <h3>Research Team</h3>
+          <p><strong>${DOMPurify.sanitize(req.body.subject)}</strong></p>
+          <p>${DOMPurify.sanitize(req.body.text)}</p>
+      </div>
+  `
+};
+
+
+
+
+
+
+
+
+
+
         smtpTransport.sendMail(mailOptions, function(err) {
             if(err){
                 console.log(err);
