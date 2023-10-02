@@ -58,8 +58,7 @@ router.get("/markingTitle/get/:id", (req, res) => {
 // Update Marking Scheme Title
 
 router.put("/markingTitle/update/:id", (req, res) => {
-
-  if (req.body.isAdmin === '0') { // Assuming you have user roles and authentication implemented
+  if (!req.body.isAdmin === '0') {
     return res.status(403).json({ error: 'Access Denied' });
   } else {
     MarkingSchemTitle.findByIdAndUpdate(
@@ -77,8 +76,6 @@ router.put("/markingTitle/update/:id", (req, res) => {
     }
   );
   }
-  
-  
 });
 
 // Delete Marking Scheme Title
