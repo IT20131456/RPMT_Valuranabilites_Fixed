@@ -4,9 +4,12 @@ const Users = require('../models/users');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { type } = require('express/lib/response');
-
-
+const htmlspecialchars = require('htmlspecialchars');
+const Entities = require('html-entities').AllHtmlEntities;
+const entities = new Entities();
 const router = express.Router();
+
+
 
 process.env.SECRET_KEY = "secret2022";
 
@@ -75,7 +78,7 @@ router.post('/user/registration', (req, res) => {
     })
 })
 
-//user login with jsonwebtoken - user
+// //user login with jsonwebtoken - user
 router.post("/user/login", (req, res) => {
   Users.findOne({
     idNumber: req.body.idNumber,
@@ -100,6 +103,7 @@ router.post("/user/login", (req, res) => {
           })
           res.send(userToken)
         }
+
         else {
           // res.json({ error: "Please check your password and try again" })
           return res.status(401).json({
@@ -125,6 +129,14 @@ router.post("/user/login", (req, res) => {
       console.log("error: " + err);
     })
 });
+
+
+
+
+
+
+
+
 
 //get a specific user
 router.get("/user/:id", (req, res) => {
