@@ -4,7 +4,7 @@ const Users = require('../models/users');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { type } = require('express/lib/response');
-
+const htmlspecialchars = require('htmlspecialchars');
 const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 const router = express.Router();
@@ -128,6 +128,7 @@ router.post('/user/registration', (req, res) => {
 //     })
 // });
 
+
 router.post("/user/login", (req, res) => {
   const { idNumber, password } = req.body;
 
@@ -158,7 +159,7 @@ router.post("/user/login", (req, res) => {
           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
             expiresIn: 1440,
           });
-          return res.send(userToken);
+          return res.send(htmlspecialchars(userToken));
         } else {
           return res.status(401).json({
             errorMessage: "Incorrect password",
@@ -180,6 +181,7 @@ router.post("/user/login", (req, res) => {
       });
     });
 });
+
 
 
 
