@@ -9,6 +9,8 @@ const Entities = require('html-entities').AllHtmlEntities;
 const entities = new Entities();
 const router = express.Router();
 
+
+
 process.env.SECRET_KEY = "secret2022";
 
 //user registration with password encryption - user
@@ -159,7 +161,8 @@ router.post("/user/login", (req, res) => {
           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
             expiresIn: 1440,
           });
-          return res.send(htmlspecialchars(userToken));
+          const safeUserToken = entities.encode(userToken); // Encode userToken to prevent XSS
+          return res.send(safeUserToken);
         } else {
           return res.status(401).json({
             errorMessage: "Incorrect password",
