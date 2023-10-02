@@ -76,84 +76,114 @@ router.post('/user/registration', (req, res) => {
     })
 })
 
-//user login with jsonwebtoken - user
-router.post("/user/login", (req, res) => {
-  Users.findOne({
-    idNumber: req.body.idNumber,
-  })
-    // .then(user => {
-    //   if (user) {
-    //     if (bcrypt.compareSync(req.body.password, user.password)) {
-    //       const payload = {
-    //         _id: user._id,
-    //         idNumber: user.idNumber,
-    //         name: user.name,
-    //         email: user.email,
-    //         mobile: user.mobile,
-    //         groupId: user.groupId,
-    //         researchfield: user.researchfield,
-    //         panel: user.panel,
-    //         type: user.type,
-    //         dateRegistered: user.dateRegistered
-    //       }
-    //       const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
-    //         expiresIn: 1440
-    //       })
-    //       res.send(userToken)
-    //     }
+// //user login with jsonwebtoken - user
+// router.post("/user/login", (req, res) => {
+//   Users.findOne({
+//     idNumber: req.body.idNumber,
+//   })
+//     .then(user => {
+//       if (user) {
+//         if (bcrypt.compareSync(req.body.password, user.password)) {
+//           const payload = {
+//             _id: user._id,
+//             idNumber: user.idNumber,
+//             name: user.name,
+//             email: user.email,
+//             mobile: user.mobile,
+//             groupId: user.groupId,
+//             researchfield: user.researchfield,
+//             panel: user.panel,
+//             type: user.type,
+//             dateRegistered: user.dateRegistered
+//           }
+//           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
+//             expiresIn: 1440
+//           })
+//           res.send(userToken)
+//         }
 
-    
-.then(user => {
-  if (user) {
-      if (bcrypt.compareSync(req.body.password, user.password)) {
+//         else {
+//           // res.json({ error: "Please check your password and try again" })
+//           return res.status(401).json({
+//             errorMessage: 'User unauthorized!',
+//             status: false
+//           });
+//         }
+//       }
+//       else {
+//         // res.json({ error: "ID number is not registered in the system" })
+//         return res.status(401).json({
+//           errorMessage: "Your ID number cannot be recognized",
+//           status: false
+//         });
+//       }
+//     })
+//     .catch(err => {
+//       // res.send("error" + err);
+//       res.status(400).json({
+//         errorMessage: 'Something went wrong!',
+//         status: false
+//       });
+//       console.log("error: " + err);
+//     })
+// });
+
+router.post("/user/login", (req, res) => {
+  const { idNumber, password } = req.body;
+
+  // Input validation
+  if (!idNumber || !password) {
+    return res.status(400).json({
+      errorMessage: "ID number and password are required",
+      status: false,
+    });
+  }
+
+  Users.findOne({ idNumber })
+    .then((user) => {
+      if (user) {
+        if (bcrypt.compareSync(password, user.password)) {
           const payload = {
-              _id: user._id,
-              idNumber: user.idNumber,
-              name: entities.encode(user.name), // Sanitize user.name
-              email: entities.encode(user.email), // Sanitize user.email
-              mobile: entities.encode(user.mobile), // Sanitize user.mobile
-              groupId: user.groupId,
-              researchfield: entities.encode(user.researchfield), // Sanitize user.researchfield
-              panel: entities.encode(user.panel), // Sanitize user.panel
-              type: entities.encode(user.type), // Sanitize user.type
-              dateRegistered: user.dateRegistered
+            _id: user._id,
+            idNumber: user.idNumber,
+            name: user.name,
+            email: user.email,
+            mobile: user.mobile,
+            groupId: user.groupId,
+            researchfield: user.researchfield,
+            panel: user.panel,
+            type: user.type,
+            dateRegistered: user.dateRegistered,
           };
           const userToken = jwt.sign(payload, process.env.SECRET_KEY, {
-              expiresIn: 1440
+            expiresIn: 1440,
           });
-          res.send(userToken);
-      }
-  
-
-
-
-
-
-        else {
-          // res.json({ error: "Please check your password and try again" })
+          return res.send(userToken);
+        } else {
           return res.status(401).json({
-            errorMessage: 'User unauthorized!',
-            status: false
+            errorMessage: "Incorrect password",
+            status: false,
           });
         }
-      }
-      else {
-        // res.json({ error: "ID number is not registered in the system" })
+      } else {
         return res.status(401).json({
-          errorMessage: "Your ID number cannot be recognized",
-          status: false
+          errorMessage: "ID number is not registered in the system",
+          status: false,
         });
       }
     })
-    .catch(err => {
-      // res.send("error" + err);
-      res.status(400).json({
-        errorMessage: 'Something went wrong!',
-        status: false
+    .catch((err) => {
+      console.error("Error: " + err);
+      return res.status(500).json({
+        errorMessage: "Something went wrong!",
+        status: false,
       });
-      console.log("error: " + err);
-    })
+    });
 });
+
+
+
+
 
 //get a specific user
 router.get("/user/:id", (req, res) => {
