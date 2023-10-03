@@ -140,15 +140,6 @@ const cookieParser = require("cookie-parser"); // Include the cookie-parser midd
 app.use(bodyparser.json());
 app.use(cors());
 
-// MongoDB connection URI
-const uri = process.env.MONGO_URI;
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }); // Connect to MongoDB
-
-mongoose.connection.once("open", () => {
-  console.log("MongoDB connected"); // Log a message when MongoDB connection is established
-});
-
-
 // Import routes for the application
 
 // Middleware
@@ -227,7 +218,7 @@ const server = https.createServer(options, app);
 
 
 const port = process.env.PORT || 5000;
-
+const uri = process.env.MONGO_URI;
 
 mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
 mongoose.connection.once("open", () => {
