@@ -1,17 +1,28 @@
+// Import required modules
+const https = require('https'); // Import the HTTPS module for creating a secure server
+const fs = require('fs'); // Import the File System module for reading SSL/TLS certificates
 const express = require("express");
 const mongoose = require("mongoose");
 const bodyparser = require("body-parser");
 const cors = require("cors");
-
-const http = require("http");
-const { Server } = require("socket.io");
-
+const { Server } = require("socket.io"); // Import the Socket.io server module
 require("dotenv").config();
 
-const app = express();
+const app = express(); // Create an Express.js application
 
-//import controllers
-//const controller = require("./controllers/controllers");
+// Middleware to handle JSON data and CORS
+app.use(bodyparser.json());
+app.use(cors());
+
+// MongoDB connection URI
+const uri = process.env.MONGO_URI;
+mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true }); // Connect to MongoDB
+
+mongoose.connection.once("open", () => {
+  console.log("MongoDB connected"); // Log a message when MongoDB connection is established
+});
+
+// Import routes for the application
 const sgrouter = require("./routes/studentGroupRoute");
 const sdrouter = require("./routes/supervisorDetailsRoute");
 const rerouter = require("./routes/requestRoute");
@@ -30,11 +41,7 @@ const downloadFileRoutes = require('./routes/downloadFile');
 const supportMsgRoutes = require('./routes/supportMsg');
 const noticeRoutes = require('./routes/notice');
 
-//app middleware
-
-app.use(bodyparser.json());
-app.use(cors());
-
+// Use the imported routes in the application
 app.use(sgrouter);
 app.use(sdrouter);
 app.use(rerouter);
@@ -53,24 +60,16 @@ app.use(downloadFileRoutes);
 app.use(supportMsgRoutes);
 app.use(noticeRoutes);
 
-const port = process.env.PORT || 5000;
-const uri = process.env.MONGO_URI;
+const options = {
+  key: fs.readFileSync('path/to/private-key.pem'), // Read the private key file
+  cert: fs.readFileSync('path/to/certificate.pem') // Read the certificate file
+};
 
-mongoose.connect(uri, { useNewUrlParser: true, useUnifiedTopology: true });
-mongoose.connection.once("open", () => {
-  console.log("MongoDB connected");
-});
-
-app.listen(port, () => {
-  console.log(`server is started in port ${port}`);
-});
-
-// Socket.io - Server configurations and functionalities
-
-const server = http.createServer(app);
+// Create a secure HTTPS server using the Express app and SSL/TLS certificates
+const server = https.createServer(options, app);
 
 server.listen(3001, () => {
-  console.log("CHAT SERVER RUNNING");
+  console.log("Secure server is running on port 3001"); // Log a message when the secure server is running
 });
 
 const io = new Server(server, {
